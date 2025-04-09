@@ -1,0 +1,122 @@
+# SPDX-FileCopyrightText: Copyright (c) 2024-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+general:
+  use_uvloop: true
+  telemetry:
+    logging:
+      console:
+        _type: console
+        level: WARN
+      file:
+        _type: file
+        path: /tmp/email_phishing_analyzer.log
+        level: DEBUG
+
+functions:
+  email_phishing_analyzer:
+    _type: email_phishing_analyzer
+    llm: nim_llm
+    prompt: |
+      Analyze the following email for phishing signals.
+
+      Email content:
+      {body}
+
+      Is this a phishing email? Provide a brief explanation.
+
+llms:
+  nim_llm:
+    _type: nim
+    model_name: TO_BE_REPLACED
+    temperature: 0.0
+    max_tokens: 512
+    credentials:
+      api_key: TO_BE_REPLACED
+  nim_rag_eval_llm:
+    _type: nim
+    model_name: TO_BE_REPLACED
+    temperature: 0.9
+    max_tokens: 512
+    credentials:
+      api_key: TO_BE_REPLACED
+  nim_trajectory_eval_llm:
+    _type: nim
+    model_name: TO_BE_REPLACED
+    temperature: 0.0
+    max_tokens: 512
+    credentials:
+      api_key: TO_BE_REPLACED
+
+workflow:
+  _type: tool_calling_agent
+  tool_names:
+    - email_phishing_analyzer
+  llm_name: nim_llm
+  verbose: true
+  retry_parsing_errors: true
+  max_retries: 1
+
+eval:
+  general:
+    output_dir: results/MODEL_ID/
+    verbose: true
+    dataset:
+        _type: csv
+        file_path: data/test_data.csv
+        id_key: "subject"
+        structure:
+          question_key: body
+          answer_key: label
+
+    profiler:
+        token_uniqueness_forecast: true
+        workflow_runtime_forecast: true
+        compute_llm_metrics: true
+        csv_exclude_io_text: true
+        prompt_caching_prefixes:
+          enable: true
+          min_frequency: 0.1
+        bottleneck_analysis:
+          enable_nested_stack: true
+        concurrency_spike_analysis:
+          enable: true
+          spike_threshold: 7
+
+  evaluators:
+    trajectory_accuracy:
+      _type: trajectory
+      llm_name: nim_llm
+
+    rag_accuracy:
+      _type: ragas
+      metric: AnswerAccuracy
+      llm_name: nim_rag_eval_llm
+
+    rag_groundedness:
+      _type: ragas
+      metric: ResponseGroundedness
+      llm_name: nim_rag_eval_llm
+
+    rag_relevance:
+      _type: ragas
+      metric: ContextRelevance
+      llm_name: nim_rag_eval_llm
+
+# Additional configuration options:
+# 
+# To use a different API key:
+# env:
+#   NVIDIA_API_KEY: your-api-key-here
+#
+# To modify logging:
+# logging:
+#   level: INFO  # Options: DEBUG, INFO, WARNING, ERROR
+#   file: logs/model_evaluation.log
+#
+# For evaluation settings:
+# evaluation:
+#   metrics:
+#     - accuracy
+#     - latency
+#   reference_answers: data/reference_answers.jsonl 

@@ -1,0 +1,47 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="llm-showdown-agentiq",
+    version="0.1.0",
+    description="Benchmark tool for evaluating LLMs on security-related tasks",
+    author="NVIDIA AgentIQ Team",
+    author_email="example@nvidia.com",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    install_requires=[
+        "pandas>=2.0.0",
+        "numpy>=1.24.0",
+        "pyyaml>=6.0",
+        "tqdm>=4.65.0",
+        "matplotlib>=3.7.0",
+        "seaborn>=0.12.2",
+        "agentiq",
+        "langchain_nvidia_ai_endpoints",
+    ],
+    extras_require={
+        "openai": ["openai>=1.0.0"],
+        "anthropic": ["anthropic>=0.8.0"],
+        "nvidia": ["langchain-nvidia-ai-endpoints>=0.0.1"],
+        "dev": ["pytest>=7.0.0", "black>=23.0.0", "isort>=5.12.0"],
+        "all": [
+            "openai>=1.0.0",
+            "anthropic>=0.8.0",
+            "langchain-nvidia-ai-endpoints>=0.0.1",
+            "pytest>=7.0.0",
+            "black>=23.0.0",
+            "isort>=5.12.0",
+            "agentiq",
+        ],
+    },
+    python_requires=">=3.8",
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+    ],
+) 
