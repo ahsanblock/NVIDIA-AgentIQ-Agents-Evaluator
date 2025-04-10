@@ -872,7 +872,6 @@ def main():
             font-weight: 600;
         }
         .dashboard-highlight {
-            background-color: #2c3e50;
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
